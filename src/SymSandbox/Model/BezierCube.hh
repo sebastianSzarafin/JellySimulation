@@ -1,49 +1,12 @@
 #ifndef SIMULATIONAPP_BEZIERCUBE_HH
 #define SIMULATIONAPP_BEZIERCUBE_HH
 
-#include "pch.hh"
+#include <memory>
+
+#include "Spring.hh"
 
 namespace sym
 {
-  struct Spring;
-
-  struct MassPoint
-  {
-    MassPoint(glm::vec3 pos, float m) : m_position{ pos }, m_velocity{ 0, 0, 0 }, m_mass{ m } {}
-    MassPoint(const MassPoint& other) = default;
-
-    glm::vec3 m_position;
-    glm::vec3 m_velocity;
-    float m_mass;
-    std::vector<Spring*> m_connections{};
-
-    glm::vec3 compute_force();
-  };
-
-  struct Spring
-  {
-    enum Orientation
-    {
-      P1toP2 = -1,
-      P2toP1 = 1
-    };
-
-    enum Type
-    {
-      Side,
-      Diagonal
-    };
-
-    MassPoint* m_p1;
-    MassPoint* m_p2;
-    float m_l0; // rest length
-    float m_c;  // damping coefficient
-    float m_k;  // stiffness coefficient
-    Type m_type;
-
-    glm::vec3 compute_force(Orientation orientation) const;
-  };
-
   class BezierCube
   {
    public:
@@ -53,6 +16,7 @@ namespace sym
 
     auto& get_batch_points() { return m_batch.m_points; }
     auto& get_batch_springs() { return m_batch.m_springs; }
+    std::vector<MassPoint*> get_corners() const;
 
    private:
     void create_spring(MassPoint* p1, MassPoint* p2, uint32_t& idx, float l0, float c, float k, Spring::Type type);
