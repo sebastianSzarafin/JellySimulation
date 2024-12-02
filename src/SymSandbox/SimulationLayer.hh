@@ -139,7 +139,7 @@ namespace sym
     {
       std::shared_ptr<BezierCube> m_model;
       glm::vec3 m_color       = { 1, 0, 0 };
-      glm::vec3 m_translation = { -SimulationData::s_a / 2, -SimulationData::s_a / 2, -SimulationData::s_a / 2 };
+      glm::vec3 m_translation = { 0, 0, 0 };
       glm::quat m_rotation    = { 1, 0, 0, 0 };
       float m_scale           = 1.f;
 
@@ -167,7 +167,7 @@ namespace sym
     {
       std::shared_ptr<SteeringCube> m_model;
       glm::vec3 m_color       = { 0, 1, 0 };
-      glm::vec3 m_translation = { -SimulationData::s_a / 2, -SimulationData::s_a / 2, -SimulationData::s_a / 2 };
+      glm::vec3 m_translation = { 0, 0, 0 };
       glm::quat m_rotation    = { 1, 0, 0, 0 };
       float m_scale           = 1.f;
 

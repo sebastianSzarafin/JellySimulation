@@ -93,15 +93,17 @@ namespace sym
 
   void BezierCube::init_points(float a, float m)
   {
-    float side_dist = a / 3;
-    uint32_t p_idx  = 0;
+    float side_dist  = a / 3;
+    glm::vec3 offset = { -a / 2, -a / 2, -a / 2 };
+    uint32_t p_idx   = 0;
     for (int y = 0; y < 4; ++y)
     {
       for (int z = 0; z < 4; ++z)
       {
         for (int x = 0; x < 4; ++x)
         {
-          m_points[p_idx++] = std::make_shared<MassPoint>(glm::vec3(x * side_dist, y * side_dist, z * side_dist), m);
+          auto pos          = glm::vec3(x * side_dist, y * side_dist, z * side_dist) + offset;
+          m_points[p_idx++] = std::make_shared<MassPoint>(pos, m);
         }
       }
     }
