@@ -10,6 +10,8 @@ namespace sym_base
 
   void RendererAPI::set_line_width(float width) { glLineWidth(width); }
 
+  void RendererAPI::set_point_size(float size) { glPointSize(size); }
+
   void RendererAPI::depth_buffering(bool on)
   {
     if (on)

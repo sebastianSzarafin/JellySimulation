@@ -22,6 +22,7 @@ namespace sym_base
     void set_clear_color(const glm::vec4& color);
     void set_draw_primitive(const DrawPrimitive& primitive);
     void set_line_width(float width);
+    void set_point_size(float size);
 
     void depth_buffering(bool on);
     void anti_aliasing(bool on);

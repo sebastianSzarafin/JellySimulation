@@ -13,6 +13,8 @@ namespace sym_base
 
   void RenderCommand::set_line_width(float width) { m_renderer_api->set_line_width(width); }
 
+  void RenderCommand::set_point_size(float size) { m_renderer_api->set_point_size(size); }
+
   void RenderCommand::depth_buffering(bool on) { m_renderer_api->depth_buffering(on); }
 
   void RenderCommand::anti_aliasing(bool on) { m_renderer_api->anti_aliasing(on); }
