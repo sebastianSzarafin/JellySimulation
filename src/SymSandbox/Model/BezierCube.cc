@@ -29,7 +29,7 @@ namespace sym
   {
     // Test 1
     //    static float time = 0, up = 1;
-    //    glm::vec3 dir = glm::normalize(m_points[16]->m_position - m_points[0]->m_position);
+    //    glm::vec3 dir = glm::normalize(m_points[16]->get_position() - m_points[0]->get_position());
     //    if (time < 1)
     //    {
     //      time += dt;
@@ -62,7 +62,7 @@ namespace sym
 
     for (auto& m_point : m_points)
     {
-      m_point->m_position += m_point->m_velocity * dt;
+      m_point->move(m_point->m_velocity * dt);
       m_point->m_velocity += m_point->compute_force() / m_point->m_mass * dt;
     }
 
@@ -79,14 +79,14 @@ namespace sym
   {
     for (int i = 0; i < m_points.size(); i++)
     {
-      m_batch.m_points[i] = m_points[i]->m_position;
+      m_batch.m_points[i] = m_points[i]->get_position();
     }
 
     for (int i = 0; i < m_springs.size(); i++)
     {
       if (m_springs[i]->m_type == Spring::Side)
       {
-        m_batch.m_springs[i] = { m_springs[i]->m_p1->m_position, m_springs[i]->m_p2->m_position };
+        m_batch.m_springs[i] = { m_springs[i]->m_p1->get_position(), m_springs[i]->m_p2->get_position() };
       }
     }
   }

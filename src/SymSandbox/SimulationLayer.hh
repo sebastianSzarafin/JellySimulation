@@ -5,8 +5,7 @@
 #include "pch.hh"
 
 #include "DockSpaceLayer.hh"
-#include "Model/BezierCube.hh"
-#include "Model/SteeringCube.hh"
+#include "SimulationContext.hh"
 #include "SimulationData.hh"
 
 using namespace sym_base;
@@ -22,16 +21,11 @@ namespace sym
 
       // jelly
       {
-        m_jelly.m_model = std::make_shared<BezierCube>(SimulationData::s_a,
-                                                       SimulationData::s_m,
-                                                       SimulationData::s_c1,
-                                                       SimulationData::s_k);
-
         m_jelly.m_shader = std::make_shared<Shader>("shaders/point.glsl");
 
         // points
         {
-          auto batch = m_jelly.m_model->get_batch_points();
+          auto batch = SimulationContext::s_jelly_cube->get_batch_points();
           auto vertex_buffer =
               std::make_shared<VertexBuffer>(batch.data(), sizeof(batch), sizeof(Vertex), BufferType::DYNAMIC);
           vertex_buffer->set_layout(layout);
@@ -42,7 +36,7 @@ namespace sym
 
         // springs
         {
-          auto batch = m_jelly.m_model->get_batch_springs();
+          auto batch = SimulationContext::s_jelly_cube->get_batch_springs();
           auto vertex_buffer =
               std::make_shared<VertexBuffer>(batch.data(), sizeof(batch), sizeof(Vertex), BufferType::DYNAMIC);
           vertex_buffer->set_layout(layout);
@@ -54,9 +48,7 @@ namespace sym
 
       // steering cube
       {
-        m_steering_cube.m_model = std::make_shared<SteeringCube>(m_jelly.m_model->get_corners());
-
-        auto batch = m_steering_cube.m_model->get_batch();
+        auto batch = SimulationContext::s_steering_cube->get_batch();
         auto vertex_buffer =
             std::make_shared<VertexBuffer>(batch.data(), sizeof(batch), sizeof(Vertex), BufferType::DYNAMIC);
         vertex_buffer->set_layout(layout);
@@ -79,15 +71,15 @@ namespace sym
 
       // jelly
       {
-        m_jelly.m_model->update(dt);
+        SimulationContext::s_jelly_cube->update(dt);
 
         m_jelly.m_shader->bind();
         m_jelly.m_shader->upload_uniform_float3("u_Color", m_jelly.m_color);
-        auto mvp = camera->get_projection() * camera->get_view() * m_jelly.get_model_mat();
+        auto mvp = camera->get_projection() * camera->get_view();
         m_jelly.m_shader->upload_uniform_mat4("u_MVP", mvp);
         // points
         {
-          auto batch = m_jelly.m_model->get_batch_points();
+          auto batch = SimulationContext::s_jelly_cube->get_batch_points();
           m_jelly.m_points.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
           RenderCommand::set_draw_primitive(DrawPrimitive::POINTS);
           RenderCommand::set_point_size(5);
@@ -96,7 +88,7 @@ namespace sym
         }
         // springs
         {
-          auto batch = m_jelly.m_model->get_batch_springs();
+          auto batch = SimulationContext::s_jelly_cube->get_batch_springs();
           m_jelly.m_springs.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
           RenderCommand::set_draw_primitive(DrawPrimitive::LINES);
           RenderCommand::set_line_width(1);
@@ -106,11 +98,13 @@ namespace sym
       }
       // steering cube
       {
+        SimulationContext::s_steering_cube->update(dt);
+
         m_steering_cube.m_shader->bind();
         m_steering_cube.m_shader->upload_uniform_float3("u_Color", m_steering_cube.m_color);
-        auto mvp = camera->get_projection() * camera->get_view() * m_steering_cube.get_model_mat();
+        auto mvp = camera->get_projection() * camera->get_view();
         m_steering_cube.m_shader->upload_uniform_mat4("u_MVP", mvp);
-        auto batch = m_steering_cube.m_model->get_batch();
+        auto batch = SimulationContext::s_steering_cube->get_batch();
         m_steering_cube.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
         RenderCommand::set_draw_primitive(DrawPrimitive::LINES);
         RenderCommand::set_line_width(2);
@@ -137,12 +131,7 @@ namespace sym
 
     struct
     {
-      std::shared_ptr<BezierCube> m_model;
-      glm::vec3 m_color       = { 1, 0, 0 };
-      glm::vec3 m_translation = { 0, 0, 0 };
-      glm::quat m_rotation    = { 1, 0, 0, 0 };
-      float m_scale           = 1.f;
-
+      glm::vec3 m_color = { 1, 0, 0 };
       std::shared_ptr<Shader> m_shader;
 
       struct
@@ -155,31 +144,13 @@ namespace sym
         std::shared_ptr<VertexArray> m_va;
       } m_springs;
 
-      glm::mat4 get_model_mat()
-      {
-        return glm::translate(glm::mat4(1.f), m_translation) * glm::mat4_cast(m_rotation) *
-            glm::scale(glm::mat4(1.f), glm::vec3(m_scale));
-      }
-
     } m_jelly;
 
     struct
     {
-      std::shared_ptr<SteeringCube> m_model;
-      glm::vec3 m_color       = { 0, 1, 0 };
-      glm::vec3 m_translation = { 0, 0, 0 };
-      glm::quat m_rotation    = { 1, 0, 0, 0 };
-      float m_scale           = 1.f;
-
+      glm::vec3 m_color = { 0, 1, 0 };
       std::shared_ptr<VertexArray> m_va;
       std::shared_ptr<Shader> m_shader;
-
-      glm::mat4 get_model_mat()
-      {
-        return glm::translate(glm::mat4(1.f), m_translation) * glm::mat4_cast(m_rotation) *
-            glm::scale(glm::mat4(1.f), glm::vec3(m_scale));
-      }
-
     } m_steering_cube;
   };
 } // namespace sym

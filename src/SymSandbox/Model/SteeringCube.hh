@@ -1,6 +1,7 @@
 #ifndef SIMULATIONAPP_STEERINGCUBE_HH
 #define SIMULATIONAPP_STEERINGCUBE_HH
 
+#include <glm/ext/quaternion_float.hpp>
 #include <memory>
 
 #include "Spring.hh"
@@ -12,6 +13,8 @@ namespace sym
    public:
     SteeringCube(const std::vector<MassPoint*>& points);
 
+    void update(float dt);
+
     auto& get_batch() { return m_batch.m_points; }
 
    private:
@@ -20,7 +23,7 @@ namespace sym
     void prepare_batch();
 
    private:
-    std::array<std::shared_ptr<Point>, 8> m_points;
+    std::array<std::shared_ptr<SteeringPoint>, 8> m_points;
     std::array<std::shared_ptr<Spring>, 8> m_springs;
 
     struct

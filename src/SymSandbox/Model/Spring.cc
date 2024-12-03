@@ -5,7 +5,7 @@ namespace sym
 {
   glm::vec3 Spring::compute_force(Spring::Orientation orientation) const
   {
-    auto dir = m_p2->m_position - m_p1->m_position;
+    auto dir = m_p2->get_position() - m_p1->get_position();
     if (glm::length(dir) < FLT_EPSILON) { return glm::vec3(0); }
     auto dist = glm::length(dir);
     auto l    = dist - m_l0;

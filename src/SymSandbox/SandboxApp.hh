@@ -21,6 +21,12 @@ namespace sym
       // setup simulation
       SimulationContext::s_camera = std::make_shared<OrbitCamera>();
       SimulationContext::s_camera->set_position({ 0, 0, 5 });
+      SimulationContext::s_jelly_cube = std::make_shared<BezierCube>(SimulationData::s_a,
+                                                                     SimulationData::s_m,
+                                                                     SimulationData::s_c1,
+                                                                     SimulationData::s_k);
+      SimulationContext::s_steering_cube =
+          std::make_shared<SteeringCube>(SimulationContext::s_jelly_cube->get_corners());
 
       // create application layers
       push_layer(new InputLayer());
