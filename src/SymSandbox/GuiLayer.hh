@@ -73,13 +73,13 @@ namespace sym
           ImGui::TableNextRow();
           ImGui::TableSetColumnIndex(0);
           ImGui::PushItemWidth(-FLT_MIN);
-          ImGui::DragFloat("##RotationX", &SimulationData::s_rotation.x, .05f, 0.f, 360.f);
+          ImGui::DragFloat("##RotationX", &SimulationData::s_rotation.x, .01f, -3.14f, 3.14f);
           ImGui::TableSetColumnIndex(1);
           ImGui::PushItemWidth(-FLT_MIN);
-          ImGui::DragFloat("##RotationY", &SimulationData::s_rotation.y, .05f, 0.f, 360.f);
+          ImGui::DragFloat("##RotationY", &SimulationData::s_rotation.y, .01f, -3.14f, 3.14f);
           ImGui::TableSetColumnIndex(2);
           ImGui::PushItemWidth(-FLT_MIN);
-          ImGui::DragFloat("##RotationZ", &SimulationData::s_rotation.z, .05f, 0.f, 360.f);
+          ImGui::DragFloat("##RotationZ", &SimulationData::s_rotation.z, .01f, -3.14f, 3.14f);
           ImGui::PopItemWidth();
 
           ImGui::EndTable();
