@@ -102,7 +102,7 @@ namespace sym
 
         m_steering_cube.m_shader->bind();
         m_steering_cube.m_shader->upload_uniform_float3("u_Color", m_steering_cube.m_color);
-        auto mvp = camera->get_projection() * camera->get_view();
+        auto mvp = camera->get_projection() * camera->get_view() * m_steering_cube.m_model;
         m_steering_cube.m_shader->upload_uniform_mat4("u_MVP", mvp);
         auto batch = SimulationContext::s_steering_cube->get_batch();
         m_steering_cube.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
@@ -151,6 +151,7 @@ namespace sym
       glm::vec3 m_color = { 0, 1, 0 };
       std::shared_ptr<VertexArray> m_va;
       std::shared_ptr<Shader> m_shader;
+      const glm::mat4 m_model = glm::scale(glm::mat4(1), glm::vec3(1.01f));
     } m_steering_cube;
   };
 } // namespace sym
