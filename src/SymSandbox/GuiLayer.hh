@@ -33,7 +33,13 @@ namespace sym
         ImGui::Text("FPS: %.1f", m_fps_manager.m_current_fps);
         ImGui::Text("Simulation time: %.1f", Clock::now());
         ImGui::Spacing();
-
+        // --------------------------------------- PARAMETERS ---------------------------------------
+        ImGui::SeparatorText("Jelly parameters");
+        // ...
+        ImGui::Text("TODO");
+        ImGui::Spacing();
+        // ------------------------------------ MOVEMENT SECTION ------------------------------------
+        ImGui::SeparatorText("Movement");
         if (ImGui::BeginTable("TransformTableRowLabels", 1, 0, ImVec2(100, 0)))
         {
           ImGui::TableNextRow();
@@ -49,7 +55,6 @@ namespace sym
           ImGui::EndTable();
         }
         ImGui::SameLine();
-
         static ImGuiTableFlags flags = ImGuiTableFlags_BordersOuterV | ImGuiTableFlags_BordersInnerV;
         if (ImGui::BeginTable("TransformTable", 3, flags))
         {
@@ -87,7 +92,7 @@ namespace sym
       }
       ImGui::End();
 
-      //      ImGui::ShowDemoWindow();
+      ImGui::ShowDemoWindow();
     }
 
    private:
