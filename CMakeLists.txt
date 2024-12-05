@@ -8,5 +8,6 @@ file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/SymSandbox/*.cc)
 add_executable(${PROJECT_NAME} ${SOURCES} src/main.cc)
 
 add_subdirectory(src/SymBase)
+add_subdirectory(src/SymSandbox)
 
 target_link_libraries(${PROJECT_NAME} SymBase)

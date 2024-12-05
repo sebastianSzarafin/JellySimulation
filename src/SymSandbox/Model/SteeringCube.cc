@@ -1,5 +1,5 @@
 #include "SteeringCube.hh"
-#include "src/SymSandbox/SimulationData.hh"
+#include "SimulationData.hh"
 
 namespace sym
 {
