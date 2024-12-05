@@ -66,6 +66,11 @@ namespace sym
       m_point->m_velocity += m_point->compute_force() / m_point->m_mass * dt;
     }
 
+    for (auto& m_point : m_points)
+    {
+      m_point->detect_collision();
+    }
+
     prepare_batch();
   }
 
@@ -108,7 +113,6 @@ namespace sym
       }
     }
   }
-
   void BezierCube::init_springs(float a, float c, float k)
   {
     float side_dist = a / 3;

@@ -31,6 +31,7 @@ namespace sym
     MassPoint(const MassPoint& other) = default;
 
     glm::vec3 compute_force();
+    void detect_collision();
 
     float m_mass;
   };

@@ -62,6 +62,40 @@ namespace sym
 
         m_steering_cube.m_shader = std::make_shared<Shader>("shaders/point.glsl");
       }
+
+      // bounding cube
+      {
+        float off          = m_bounding_cube.m_a / 2;
+        Vertex vertices[8] = {
+          { { -off, -off, off } },  { { off, -off, off } },  { { off, off, off } },  { { -off, off, off } },
+          { { -off, -off, -off } }, { { off, -off, -off } }, { { off, off, -off } }, { { -off, off, -off } },
+        };
+        auto vertex_buffer = std::make_shared<VertexBuffer>(vertices, sizeof(vertices), sizeof(Vertex));
+        vertex_buffer->set_layout(layout);
+
+        // edges
+        {
+          uint32_t indices[] = { 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 3, 7, 2, 6 };
+          auto index_buffer  = std::make_shared<IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+
+          m_bounding_cube.m_va_edges = std::make_shared<VertexArray>();
+          m_bounding_cube.m_va_edges->add_vertex_buffer(vertex_buffer);
+          m_bounding_cube.m_va_edges->set_index_buffer(index_buffer);
+        }
+
+        // interior
+        {
+          uint32_t indices[] = { 0, 2, 1, 2, 0, 3, 1, 6, 5, 6, 1, 2, 4, 5, 6, 6, 7, 4,
+                                 0, 4, 7, 7, 3, 0, 0, 1, 5, 0, 5, 4, 3, 6, 2, 3, 7, 6 };
+          auto index_buffer  = std::make_shared<IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+
+          m_bounding_cube.m_va_interior = std::make_shared<VertexArray>();
+          m_bounding_cube.m_va_interior->add_vertex_buffer(vertex_buffer);
+          m_bounding_cube.m_va_interior->set_index_buffer(index_buffer);
+        }
+
+        m_bounding_cube.m_shader = std::make_shared<Shader>("shaders/bounding_cube.glsl");
+      }
     }
     ~SimulationLayer() = default;
 
@@ -111,6 +145,28 @@ namespace sym
         Renderer::submit(m_steering_cube.m_va);
         m_steering_cube.m_va->unbind();
       }
+      // bounding cube
+      {
+        m_bounding_cube.m_shader->bind();
+        m_bounding_cube.m_shader->upload_uniform_float3("u_Color", m_bounding_cube.m_color);
+        auto mvp = camera->get_projection() * camera->get_view() * m_bounding_cube.m_model;
+        m_bounding_cube.m_shader->upload_uniform_mat4("u_MVP", mvp);
+        // edges
+        {
+          m_bounding_cube.m_shader->upload_uniform_float("u_Alpha", 1);
+          RenderCommand::set_draw_primitive(DrawPrimitive::LINES);
+          RenderCommand::set_line_width(2);
+          Renderer::submit(m_bounding_cube.m_va_edges);
+          m_bounding_cube.m_va_edges->unbind();
+        }
+        // interior
+        {
+          m_bounding_cube.m_shader->upload_uniform_float("u_Alpha", .1f);
+          RenderCommand::set_draw_primitive(DrawPrimitive::TRIANGLES);
+          Renderer::submit(m_bounding_cube.m_va_interior);
+          m_bounding_cube.m_va_interior->unbind();
+        }
+      }
     }
 
     virtual void imgui_update(float dt)
@@ -153,6 +209,16 @@ namespace sym
       std::shared_ptr<Shader> m_shader;
       const glm::mat4 m_model = glm::scale(glm::mat4(1), glm::vec3(1.01f));
     } m_steering_cube;
+
+    struct
+    {
+      float m_a         = SimulationData::s_A;
+      glm::vec3 m_color = { 0, 0, 1 };
+      std::shared_ptr<VertexArray> m_va_edges;
+      std::shared_ptr<VertexArray> m_va_interior;
+      std::shared_ptr<Shader> m_shader;
+      const glm::mat4 m_model = glm::mat4(1);
+    } m_bounding_cube;
   };
 } // namespace sym
 

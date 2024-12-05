@@ -19,6 +19,7 @@ namespace sym
    private:
     void handle_keyboard_input(float dt)
     {
+      // ----------------------------------- mouse movement ----------------------------------
       float zoom         = 0;
       glm::vec2 rotation = { 0, 0 };
       if (Input::is_key_pressed(GLFW_KEY_W)) { rotation.y -= m_keyboard_sens; }
@@ -30,6 +31,14 @@ namespace sym
 
       SimulationContext::s_camera->zoom(zoom, dt);
       SimulationContext::s_camera->rotate(rotation.x, rotation.y, dt);
+      // ------------------------------ steering cube movement ------------------------------
+      float movement_speed = 2 * dt;
+      if (Input::is_key_pressed(GLFW_KEY_I)) { SimulationData::s_translation.y += movement_speed; }
+      if (Input::is_key_pressed(GLFW_KEY_K)) { SimulationData::s_translation.y -= movement_speed; }
+      if (Input::is_key_pressed(GLFW_KEY_J)) { SimulationData::s_translation.x -= movement_speed; }
+      if (Input::is_key_pressed(GLFW_KEY_L)) { SimulationData::s_translation.x += movement_speed; }
+      if (Input::is_key_pressed(GLFW_KEY_U)) { SimulationData::s_translation.z += movement_speed; }
+      if (Input::is_key_pressed(GLFW_KEY_O)) { SimulationData::s_translation.z -= movement_speed; }
     }
 
    private:
