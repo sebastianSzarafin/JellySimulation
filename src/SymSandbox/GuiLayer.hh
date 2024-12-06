@@ -30,15 +30,80 @@ namespace sym
     {
       ImGui::Begin(DockWinId::s_settings.c_str());
       {
+        bool simulation_reset = false;
+
         ImGui::Text("FPS: %.1f", m_fps_manager.m_current_fps);
         ImGui::Text("Simulation time: %.1f", Clock::now());
         ImGui::Spacing();
         // --------------------------------------- PARAMETERS ---------------------------------------
-        ImGui::SeparatorText("Jelly parameters");
-        // ...
-        ImGui::Text("TODO");
-        ImGui::Spacing();
-        // ------------------------------------ MOVEMENT SECTION ------------------------------------
+        ImGui::SeparatorText("Parameters");
+        /* -------------------- Time step -------------------- */
+        {
+          static float s_dt = SimulationData::s_dt;
+          ImGui::SliderFloat("Time step (dt)", &s_dt, .001f, .2f);
+          if (std::fabs(s_dt - SimulationData::s_dt) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset     = true;
+            SimulationData::s_dt = s_dt;
+          }
+          ImGui::Spacing();
+        }
+        /* -------------------- Mass -------------------- */
+        {
+          static float s_m = SimulationData::s_m;
+          ImGui::SliderFloat("Mass (m)", &s_m, .01f, 100.f, "%.2f");
+          if (std::fabs(s_m - SimulationData::s_m) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset    = true;
+            SimulationData::s_m = s_m;
+          }
+          ImGui::Spacing();
+        }
+        /* -------------------- Elasticity (jelly) -------------------- */
+        {
+          static float s_c1 = SimulationData::s_c1;
+          ImGui::SliderFloat("Elasticity (c1) - jelly", &s_c1, .01f, 100.f, "%.2f");
+          if (std::fabs(s_c1 - SimulationData::s_c1) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset     = true;
+            SimulationData::s_c1 = s_c1;
+          }
+          ImGui::Spacing();
+        }
+        /* -------------------- Elasticity (steering cube) -------------------- */
+        {
+          static float s_c2 = SimulationData::s_c2;
+          ImGui::SliderFloat("Elasticity (c2) - steering cube", &s_c2, .01f, 100.f, "%.2f");
+          if (std::fabs(s_c2 - SimulationData::s_c2) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset     = true;
+            SimulationData::s_c2 = s_c2;
+          }
+          ImGui::Spacing();
+        }
+        /* -------------------- Damping -------------------- */
+        {
+          static float s_k = SimulationData::s_k;
+          ImGui::SliderFloat("Damping (k)", &s_k, 0, 100.f, "%.2f");
+          if (std::fabs(s_k - SimulationData::s_k) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset    = true;
+            SimulationData::s_k = s_k;
+          }
+          ImGui::Spacing();
+        }
+        /* -------------------- Rebound elasticity -------------------- */
+        {
+          static float s_gamma = SimulationData::s_gamma;
+          ImGui::SliderFloat("Rebound elasticity (gamma)", &s_gamma, 0, 1.f, "%.2f");
+          if (std::fabs(s_gamma - SimulationData::s_gamma) > FLT_EPSILON && ImGui::IsItemDeactivatedAfterEdit())
+          {
+            simulation_reset        = true;
+            SimulationData::s_gamma = s_gamma;
+          }
+          ImGui::Spacing();
+        }
+        //  ------------------------------------ MOVEMENT SECTION ------------------------------------
         ImGui::SeparatorText("Movement");
         if (ImGui::BeginTable("TransformTableRowLabels", 1, 0, ImVec2(100, 0)))
         {
@@ -89,10 +154,47 @@ namespace sym
 
           ImGui::EndTable();
         }
+
+        static bool simulation_paused = false;
+        if (ImGui::Button("Reset") || simulation_reset)
+        {
+          // critical
+          {
+            std::lock_guard<std::mutex> lock(SimulationContext::s_mtx);
+            SimulationContext::reset_jelly();
+          }
+          SimulationData::s_translation = { 0, 0, 0 };
+          SimulationData::s_rotation    = { 0, 0, 0 };
+          Application::get().reset_simulation();
+          simulation_paused = false;
+        }
+        ImGui::SameLine();
+        if (simulation_paused)
+        {
+          if (ImGui::Button("Resume"))
+          {
+            Application::get().resume_simulation();
+            simulation_paused = false;
+          }
+        }
+        else if (ImGui::Button("Pause"))
+        {
+          Application::get().pause_simulation();
+          simulation_paused = true;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Start"))
+        {
+          // critical
+          {
+            std::lock_guard<std::mutex> lock(SimulationContext::s_mtx);
+            SimulationContext::reset_jelly();
+          }
+          Application::get().start_simulation();
+          simulation_paused = false;
+        }
       }
       ImGui::End();
-
-      ImGui::ShowDemoWindow();
     }
 
    private:
