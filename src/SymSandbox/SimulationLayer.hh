@@ -130,6 +130,8 @@ namespace sym
       }
       // steering cube
       {
+        SimulationContext::s_steering_cube->update(dt);
+        
         m_steering_cube.m_shader->bind();
         m_steering_cube.m_shader->upload_uniform_float3("u_Color", m_steering_cube.m_color);
         auto mvp = camera->get_projection() * camera->get_view() * m_steering_cube.m_model;

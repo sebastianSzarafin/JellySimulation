@@ -28,7 +28,6 @@ namespace sym
           {
             std::lock_guard<std::mutex> lock(SimulationContext::s_mtx);
             SimulationContext::s_jelly_cube->update(SimulationData::s_dt);
-            SimulationContext::s_steering_cube->update(SimulationData::s_dt);
           },
           LoopStatus::running);
 
