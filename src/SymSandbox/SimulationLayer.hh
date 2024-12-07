@@ -131,7 +131,7 @@ namespace sym
       // steering cube
       {
         SimulationContext::s_steering_cube->update(dt);
-        
+
         m_steering_cube.m_shader->bind();
         m_steering_cube.m_shader->upload_uniform_float3("u_Color", m_steering_cube.m_color);
         auto mvp = camera->get_projection() * camera->get_view() * m_steering_cube.m_model;
@@ -211,7 +211,7 @@ namespace sym
     struct
     {
       float m_a         = SimulationData::s_A;
-      glm::vec3 m_color = { 0, 0, 1 };
+      glm::vec3 m_color = { .75f, .75f, .75f };
       std::shared_ptr<VertexArray> m_va_edges;
       std::shared_ptr<VertexArray> m_va_interior;
       std::shared_ptr<Shader> m_shader;
