@@ -94,6 +94,38 @@ namespace sym
         m_batch.m_springs[i] = { m_springs[i]->m_p1->get_position(), m_springs[i]->m_p2->get_position() };
       }
     }
+
+    auto idx = 0;
+    // top
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[i + 48]->get_position();
+    }
+    // bottom
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
+    }
+    // left
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) * 4]->get_position();
+    }
+    // right
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) * 4 + 3]->get_position();
+    }
+    // near
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) + 12]->get_position();
+    }
+    // far
+    for (int i = 0; i < 16; i++)
+    {
+      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4)]->get_position();
+    }
   }
 
   void BezierCube::init_points(float a, float m)

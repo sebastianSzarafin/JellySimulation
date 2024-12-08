@@ -63,6 +63,19 @@ namespace sym
         m_steering_cube.m_shader = std::make_shared<Shader>("shaders/point.glsl");
       }
 
+      // bezier surface
+      {
+        auto batch = SimulationContext::s_jelly_cube->get_batch_sides();
+        auto vertex_buffer =
+            std::make_shared<VertexBuffer>(batch.data(), sizeof(batch), sizeof(Vertex), BufferType::DYNAMIC);
+        vertex_buffer->set_layout(layout);
+
+        m_bezier_surface.m_va = std::make_shared<VertexArray>();
+        m_bezier_surface.m_va->add_vertex_buffer(vertex_buffer);
+
+        m_bezier_surface.m_shader = std::make_shared<Shader>("shaders/bezier_surface.glsl");
+      }
+
       // bounding cube
       {
         float off          = m_bounding_cube.m_a / 2;
@@ -143,6 +156,23 @@ namespace sym
         Renderer::submit(m_steering_cube.m_va);
         m_steering_cube.m_va->unbind();
       }
+      // bezier surface
+      {
+        m_bezier_surface.m_shader->bind();
+        m_bezier_surface.m_shader->upload_uniform_float3("u_Color", m_bezier_surface.m_color);
+        auto mvp = camera->get_projection() * camera->get_view();
+        m_bezier_surface.m_shader->upload_uniform_mat4("u_MVP", mvp);
+        m_bezier_surface.m_shader->upload_uniform_int("u_Tess_u", m_bezier_surface.m_tess_uv);
+        m_bezier_surface.m_shader->upload_uniform_int("u_Tess_v", m_bezier_surface.m_tess_uv);
+        auto batch = SimulationContext::s_jelly_cube->get_batch_sides();
+        m_bezier_surface.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
+        RenderCommand::set_draw_primitive(DrawPrimitive::PATCHES);
+        RenderCommand::set_patch_size(m_bezier_surface.m_patch_size);
+        RenderCommand::face_culling(false);
+        Renderer::submit(m_bezier_surface.m_va);
+        RenderCommand::face_culling(true);
+        m_bezier_surface.m_va->unbind();
+      }
       // bounding cube
       {
         m_bounding_cube.m_shader->bind();
@@ -207,6 +237,15 @@ namespace sym
       std::shared_ptr<Shader> m_shader;
       const glm::mat4 m_model = glm::scale(glm::mat4(1), glm::vec3(1.01f));
     } m_steering_cube;
+
+    struct
+    {
+      glm::vec3 m_color           = { 1, 1, 0 };
+      const uint32_t m_patch_size = 16;
+      const uint32_t m_tess_uv    = 16;
+      std::shared_ptr<VertexArray> m_va;
+      std::shared_ptr<Shader> m_shader;
+    } m_bezier_surface;
 
     struct
     {

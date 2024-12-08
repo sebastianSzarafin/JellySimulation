@@ -16,6 +16,7 @@ namespace sym
 
     auto& get_batch_points() { return m_batch.m_points; }
     auto& get_batch_springs() { return m_batch.m_springs; }
+    auto& get_batch_sides() { return m_batch.m_sides; }
     std::vector<MassPoint*> get_corners() const;
 
    private:
@@ -33,6 +34,7 @@ namespace sym
     {
       std::array<glm::vec3, 64> m_points{};
       std::array<std::pair<glm::vec3, glm::vec3>, 360> m_springs{};
+      std::array<glm::vec3, 16 * 6> m_sides{};
     } m_batch;
   };
 } // namespace sym
