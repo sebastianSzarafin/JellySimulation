@@ -109,6 +109,26 @@ namespace sym
 
         m_bounding_cube.m_shader = std::make_shared<Shader>("shaders/bounding_cube.glsl");
       }
+
+      // light
+      {
+        Vertex vertices[8] = {
+          { { -1, -1, 1 } },  { { 1, -1, 1 } },  { { 1, 1, 1 } },  { { -1, 1, 1 } },
+          { { -1, -1, -1 } }, { { 1, -1, -1 } }, { { 1, 1, -1 } }, { { -1, 1, -1 } },
+        };
+        auto vertex_buffer = std::make_shared<VertexBuffer>(vertices, sizeof(vertices), sizeof(Vertex));
+        vertex_buffer->set_layout(layout);
+
+        uint32_t indices[] = { 0, 1, 2, 2, 3, 0, 4, 6, 5, 6, 4, 7, 4, 0, 3, 3, 7, 4,
+                               1, 5, 6, 6, 2, 1, 3, 2, 6, 6, 7, 3, 4, 5, 1, 1, 0, 4 };
+        auto index_buffer  = std::make_shared<IndexBuffer>(indices, sizeof(indices) / sizeof(uint32_t));
+
+        m_light.m_va = std::make_shared<VertexArray>();
+        m_light.m_va->add_vertex_buffer(vertex_buffer);
+        m_light.m_va->set_index_buffer(index_buffer);
+
+        m_light.m_shader = std::make_shared<Shader>("shaders/point.glsl");
+      }
     }
     ~SimulationLayer() = default;
 
@@ -159,18 +179,20 @@ namespace sym
       // bezier surface
       {
         m_bezier_surface.m_shader->bind();
-        m_bezier_surface.m_shader->upload_uniform_float3("u_Color", m_bezier_surface.m_color);
-        auto mvp = camera->get_projection() * camera->get_view();
-        m_bezier_surface.m_shader->upload_uniform_mat4("u_MVP", mvp);
-        m_bezier_surface.m_shader->upload_uniform_int("u_Tess_u", m_bezier_surface.m_tess_uv);
-        m_bezier_surface.m_shader->upload_uniform_int("u_Tess_v", m_bezier_surface.m_tess_uv);
+        auto vp = camera->get_projection() * camera->get_view();
+        m_bezier_surface.m_shader->upload_uniform_int("u_Tess.u", m_bezier_surface.m_tess_uv);
+        m_bezier_surface.m_shader->upload_uniform_int("u_Tess.v", m_bezier_surface.m_tess_uv);
+        m_bezier_surface.m_shader->upload_uniform_mat4("u_VP", vp);
+        m_bezier_surface.m_shader->upload_uniform_mat4("u_M", glm::mat4(1));
+        m_bezier_surface.m_shader->upload_uniform_float3("u_CameraPos", camera->get_position());
+        m_bezier_surface.m_shader->upload_uniform_float3("u_Light.pos", m_light.m_position);
+        m_bezier_surface.m_shader->upload_uniform_float3("u_Light.color", m_light.m_color);
+        m_bezier_surface.m_shader->upload_uniform_float3("u_FragColor", m_bezier_surface.m_color);
         auto batch = SimulationContext::s_jelly_cube->get_batch_sides();
         m_bezier_surface.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
         RenderCommand::set_draw_primitive(DrawPrimitive::PATCHES);
         RenderCommand::set_patch_size(m_bezier_surface.m_patch_size);
-        RenderCommand::face_culling(false);
         Renderer::submit(m_bezier_surface.m_va);
-        RenderCommand::face_culling(true);
         m_bezier_surface.m_va->unbind();
       }
       // bounding cube
@@ -194,6 +216,16 @@ namespace sym
           Renderer::submit(m_bounding_cube.m_va_interior);
           m_bounding_cube.m_va_interior->unbind();
         }
+      }
+      // light
+      {
+        m_light.m_shader->bind();
+        m_light.m_shader->upload_uniform_float3("u_Color", m_light.m_color);
+        auto mvp = camera->get_projection() * camera->get_view() * m_light.m_model;
+        m_light.m_shader->upload_uniform_mat4("u_MVP", mvp);
+        RenderCommand::set_draw_primitive(DrawPrimitive::TRIANGLES);
+        Renderer::submit(m_light.m_va);
+        m_light.m_va->unbind();
       }
     }
 
@@ -240,7 +272,7 @@ namespace sym
 
     struct
     {
-      glm::vec3 m_color           = { 1, 1, 0 };
+      glm::vec3 m_color           = { 1, 0, 0 };
       const uint32_t m_patch_size = 16;
       const uint32_t m_tess_uv    = 16;
       std::shared_ptr<VertexArray> m_va;
@@ -256,6 +288,18 @@ namespace sym
       std::shared_ptr<Shader> m_shader;
       const glm::mat4 m_model = glm::mat4(1);
     } m_bounding_cube;
+
+    struct
+    {
+      const float m_size      = .1f;
+      const glm::vec3 m_color = { 1, 1, 1 };
+      const glm::vec3 m_position =
+          glm::vec3(SimulationData::s_A / 2, SimulationData::s_A / 2, -SimulationData::s_A / 2);
+      std::shared_ptr<VertexArray> m_va;
+      std::shared_ptr<Shader> m_shader;
+      const glm::mat4 m_model = glm::translate(glm::mat4(1), m_position + glm::vec3(-m_size, -m_size, m_size)) *
+          glm::scale(glm::mat4(1), glm::vec3(m_size));
+    } m_light;
   };
 } // namespace sym
 

@@ -3,6 +3,13 @@
 
 namespace sym
 {
+  static const uint32_t top[16]    = { 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63 };
+  static const uint32_t bottom[16] = { 3, 2, 1, 0, 7, 6, 5, 4, 11, 10, 9, 8, 15, 14, 13, 12 };
+  static const uint32_t left[16]   = { 12, 8, 4, 0, 28, 24, 20, 16, 44, 40, 36, 32, 60, 56, 52, 48 };
+  static const uint32_t right[16]  = { 3, 7, 11, 15, 19, 23, 27, 31, 35, 39, 43, 47, 51, 55, 59, 63 };
+  static const uint32_t near[16]   = { 15, 14, 13, 12, 31, 30, 29, 28, 47, 46, 45, 44, 63, 62, 61, 60 };
+  static const uint32_t far[16]    = { 0, 1, 2, 3, 16, 17, 18, 19, 32, 33, 34, 35, 48, 49, 50, 51 };
+
   BezierCube::BezierCube(float a, float m, float c, float k)
   {
     init_points(a, m);
@@ -96,35 +103,29 @@ namespace sym
     }
 
     auto idx = 0;
-    // top
-    for (int i = 0; i < 16; i++)
-    {
-      m_batch.m_sides[idx++] = m_points[i + 48]->get_position();
-    }
-    // bottom
-    for (int i = 0; i < 16; i++)
+    for (const uint32_t i : top)
     {
       m_batch.m_sides[idx++] = m_points[i]->get_position();
     }
-    // left
-    for (int i = 0; i < 16; i++)
+    for (const uint32_t i : bottom)
     {
-      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) * 4]->get_position();
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
     }
-    // right
-    for (int i = 0; i < 16; i++)
+    for (const uint32_t i : left)
     {
-      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) * 4 + 3]->get_position();
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
     }
-    // near
-    for (int i = 0; i < 16; i++)
+    for (const uint32_t i : right)
     {
-      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4) + 12]->get_position();
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
     }
-    // far
-    for (int i = 0; i < 16; i++)
+    for (const uint32_t i : near)
     {
-      m_batch.m_sides[idx++] = m_points[(i / 4) * 16 + (i % 4)]->get_position();
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
+    }
+    for (const uint32_t i : far)
+    {
+      m_batch.m_sides[idx++] = m_points[i]->get_position();
     }
   }
 
