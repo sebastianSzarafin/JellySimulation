@@ -18,6 +18,11 @@ namespace sym
     // bounding cube
     static const float s_A;
     static float s_gamma; // rebound elasticity
+    // display
+    static glm::vec3 s_jelly_color;
+    static bool s_display_surface;
+    static bool s_display_points;
+    static bool s_display_springs;
   };
 
   inline float SimulationData::s_dt = .005f;
@@ -33,6 +38,11 @@ namespace sym
 
   inline const float SimulationData::s_A = 5;
   inline float SimulationData::s_gamma   = .5f;
+
+  inline glm::vec3 SimulationData::s_jelly_color = { 1, 0, 0 };
+  inline bool SimulationData::s_display_surface  = true;
+  inline bool SimulationData::s_display_points   = false;
+  inline bool SimulationData::s_display_springs  = false;
 } // namespace sym
 
 #endif // SIMULATIONAPP_SIMULATIONDATA_HH

@@ -154,7 +154,19 @@ namespace sym
 
           ImGui::EndTable();
         }
+        /* -------------------- Display -------------------- */
+        ImGui::SeparatorText("Display");
+        ImGui::Begin(DockWinId::s_settings.c_str());
+        {
+          ImGui::ColorEdit3("Jelly color", glm::value_ptr(SimulationData::s_jelly_color));
+          ImGui::End();
+        }
+        ImGui::Checkbox("Surface", &SimulationData::s_display_surface);
+        ImGui::Checkbox("Points", &SimulationData::s_display_points);
+        ImGui::Checkbox("Springs", &SimulationData::s_display_springs);
+        ImGui::Spacing();
 
+        ImGui::SeparatorText("");
         static bool simulation_paused = false;
         if (ImGui::Button("Reset") || simulation_reset)
         {

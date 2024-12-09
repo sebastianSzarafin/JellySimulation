@@ -143,6 +143,7 @@ namespace sym
         auto mvp = camera->get_projection() * camera->get_view();
         m_jelly.m_shader->upload_uniform_mat4("u_MVP", mvp);
         // points
+        if (SimulationData::s_display_points)
         {
           auto batch = SimulationContext::s_jelly_cube->get_batch_points();
           m_jelly.m_points.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
@@ -152,6 +153,7 @@ namespace sym
           m_jelly.m_points.m_va->unbind();
         }
         // springs
+        if (SimulationData::s_display_springs)
         {
           auto batch = SimulationContext::s_jelly_cube->get_batch_springs();
           m_jelly.m_springs.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
@@ -177,6 +179,7 @@ namespace sym
         m_steering_cube.m_va->unbind();
       }
       // bezier surface
+      if (SimulationData::s_display_surface)
       {
         m_bezier_surface.m_shader->bind();
         auto vp = camera->get_projection() * camera->get_view();
@@ -187,7 +190,7 @@ namespace sym
         m_bezier_surface.m_shader->upload_uniform_float3("u_CameraPos", camera->get_position());
         m_bezier_surface.m_shader->upload_uniform_float3("u_Light.pos", m_light.m_position);
         m_bezier_surface.m_shader->upload_uniform_float3("u_Light.color", m_light.m_color);
-        m_bezier_surface.m_shader->upload_uniform_float3("u_FragColor", m_bezier_surface.m_color);
+        m_bezier_surface.m_shader->upload_uniform_float3("u_FragColor", SimulationData::s_jelly_color);
         auto batch = SimulationContext::s_jelly_cube->get_batch_sides();
         m_bezier_surface.m_va->get_vertex_buffer(0)->send_data(0, sizeof(batch), batch.data());
         RenderCommand::set_draw_primitive(DrawPrimitive::PATCHES);
@@ -229,15 +232,7 @@ namespace sym
       }
     }
 
-    virtual void imgui_update(float dt)
-    {
-      // note: this should be in gui layer
-      ImGui::Begin(DockWinId::s_settings.c_str());
-      {
-        ImGui::ColorEdit3("Jelly color", glm::value_ptr(m_jelly.m_color));
-      }
-      ImGui::End();
-    }
+    virtual void imgui_update(float dt) {}
 
    private:
     struct Vertex
@@ -247,7 +242,7 @@ namespace sym
 
     struct
     {
-      glm::vec3 m_color = { 1, 0, 0 };
+      glm::vec3 m_color = { 0, 0, 0 };
       std::shared_ptr<Shader> m_shader;
 
       struct
@@ -272,7 +267,6 @@ namespace sym
 
     struct
     {
-      glm::vec3 m_color           = { 1, 0, 0 };
       const uint32_t m_patch_size = 16;
       const uint32_t m_tess_uv    = 16;
       std::shared_ptr<VertexArray> m_va;
