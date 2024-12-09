@@ -68,7 +68,7 @@ namespace sym
 
     for (auto& m_point : m_points)
     {
-      m_point->detect_collision();
+      m_point->detect_collision(dt);
     }
 
     prepare_batch();

@@ -2,8 +2,6 @@
 #include "SimulationData.hh"
 #include "Spring.hh"
 
-#define COLLISION_EPS 1e-3f
-
 namespace sym
 {
   glm::vec3 MassPoint::compute_force()
@@ -17,24 +15,38 @@ namespace sym
     return total_force;
   }
 
-  void MassPoint::detect_collision()
+  void MassPoint::detect_collision(float dt)
   {
     auto boundary = SimulationData::s_A / 2;
-    auto new_pos  = boundary - COLLISION_EPS;
-    if (std::abs(m_position.x) > boundary)
+    if (m_position.x > boundary)
     {
-      m_position.x > 0 ? m_position.x = new_pos : m_position.x = -new_pos;
-      m_velocity.x *= -SimulationData::s_gamma;
+      m_velocity.x *= m_velocity.x > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
     }
-    if (std::abs(m_position.y) > boundary)
+    if (m_position.x < -boundary)
     {
-      m_position.y > 0 ? m_position.y = new_pos : m_position.y = -new_pos;
-      m_velocity.y *= -SimulationData::s_gamma;
+      m_velocity.x *= m_velocity.x < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
     }
-    if (std::abs(m_position.z) > boundary)
+    if (m_position.y > boundary)
     {
-      m_position.z > 0 ? m_position.z = new_pos : m_position.z = -new_pos;
-      m_velocity.z *= -SimulationData::s_gamma;
+      m_velocity.y *= m_velocity.y > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
+    }
+    if (m_position.y < -boundary)
+    {
+      m_velocity.y *= m_velocity.y < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
+    }
+    if (m_position.z > boundary)
+    {
+      m_velocity.z *= m_velocity.z > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
+    }
+    if (m_position.z < -boundary)
+    {
+      m_velocity.z *= m_velocity.z < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
+      m_position += m_velocity * dt;
     }
   }
 } // namespace sym
