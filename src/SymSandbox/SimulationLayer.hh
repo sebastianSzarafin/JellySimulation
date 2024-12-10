@@ -288,10 +288,10 @@ namespace sym
       const float m_size      = .1f;
       const glm::vec3 m_color = { 1, 1, 1 };
       const glm::vec3 m_position =
-          glm::vec3(SimulationData::s_A / 2, SimulationData::s_A / 2, -SimulationData::s_A / 2);
+          glm::vec3(-SimulationData::s_A / 2, SimulationData::s_A / 2, SimulationData::s_A / 2);
       std::shared_ptr<VertexArray> m_va;
       std::shared_ptr<Shader> m_shader;
-      const glm::mat4 m_model = glm::translate(glm::mat4(1), m_position + glm::vec3(-m_size, -m_size, m_size)) *
+      const glm::mat4 m_model = glm::translate(glm::mat4(1), m_position + glm::vec3(m_size, -m_size, -m_size)) *
           glm::scale(glm::mat4(1), glm::vec3(m_size));
     } m_light;
   };
