@@ -2,6 +2,8 @@
 #include "SimulationData.hh"
 #include "Spring.hh"
 
+#define MAX_DEPTH 3
+
 namespace sym
 {
   glm::vec3 MassPoint::compute_force()
@@ -15,38 +17,48 @@ namespace sym
     return total_force;
   }
 
+  static uint32_t recursion_depth = 0;
   void MassPoint::detect_collision(float dt)
   {
     auto boundary = SimulationData::s_A / 2;
+    bool collide  = false;
     if (m_position.x > boundary)
     {
       m_velocity.x *= m_velocity.x > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
     if (m_position.x < -boundary)
     {
       m_velocity.x *= m_velocity.x < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
     if (m_position.y > boundary)
     {
       m_velocity.y *= m_velocity.y > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
     if (m_position.y < -boundary)
     {
       m_velocity.y *= m_velocity.y < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
     if (m_position.z > boundary)
     {
       m_velocity.z *= m_velocity.z > 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
     if (m_position.z < -boundary)
     {
       m_velocity.z *= m_velocity.z < 0 ? -SimulationData::s_gamma : SimulationData::s_gamma;
-      m_position += m_velocity * dt;
+      collide = true;
     }
+
+    recursion_depth++;
+    if (collide && recursion_depth <= MAX_DEPTH)
+    {
+      m_position += m_velocity * dt;
+      detect_collision(dt);
+    }
+    recursion_depth = 0;
   }
 } // namespace sym
