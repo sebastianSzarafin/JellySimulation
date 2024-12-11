@@ -129,6 +129,11 @@ namespace sym
 
         m_light.m_shader = std::make_shared<Shader>("shaders/point.glsl");
       }
+
+      // duck
+      {
+        m_duck.m_obj = std::make_shared<Model>("models/duck/duck.obj", "models/duck/duck.bmp", "shaders/duck.glsl");
+      }
     }
     ~SimulationLayer() = default;
 
@@ -230,6 +235,18 @@ namespace sym
         Renderer::submit(m_light.m_va);
         m_light.m_va->unbind();
       }
+      // duck
+      {
+        m_duck.m_obj->get_shader().bind();
+        auto mvp = camera->get_projection() * camera->get_view() * m_duck.m_model;
+        m_duck.m_obj->get_shader().upload_uniform_mat4("u_MVP", mvp);
+        m_duck.m_obj->get_texture().bind(0);
+        m_duck.m_obj->get_shader().upload_uniform_int("u_Texture", 0);
+        RenderCommand::set_draw_primitive(DrawPrimitive::TRIANGLES);
+        RenderCommand::set_line_width(1);
+        Renderer::submit(m_duck.m_obj->get_va());
+        m_duck.m_obj->get_va().unbind();
+      }
     }
 
     virtual void imgui_update(float dt) {}
@@ -294,6 +311,16 @@ namespace sym
       const glm::mat4 m_model = glm::translate(glm::mat4(1), m_position + glm::vec3(m_size, -m_size, -m_size)) *
           glm::scale(glm::mat4(1), glm::vec3(m_size));
     } m_light;
+
+    struct
+    {
+      std::shared_ptr<Model> m_obj;
+      const glm::vec3 m_position = { 5, 0, 0 };
+      const glm::quat m_rotation = glm::angleAxis(glm::radians(-90.f), glm::vec3(0, 1, 0));
+      const float m_scale        = .01f;
+      const glm::mat4 m_model    = glm::translate(glm::mat4(1), m_position) * glm::mat4_cast(m_rotation) *
+          glm::scale(glm::mat4(1), glm::vec3(m_scale));
+    } m_duck;
   };
 } // namespace sym
 
