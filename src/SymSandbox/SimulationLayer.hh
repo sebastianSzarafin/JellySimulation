@@ -237,10 +237,15 @@ namespace sym
         m_light.m_va->unbind();
       }
       // duck
+      if (SimulationData::s_display_rubber_duck)
       {
         m_duck.m_obj->get_shader().bind();
-        auto mvp = camera->get_projection() * camera->get_view() * m_duck.m_model;
-        m_duck.m_obj->get_shader().upload_uniform_mat4("u_MVP", mvp);
+        auto vp = camera->get_projection() * camera->get_view();
+        m_duck.m_obj->get_shader().upload_uniform_mat4("u_VP", vp);
+        m_duck.m_obj->get_shader().upload_uniform_mat4("u_M", m_duck.m_model);
+        m_duck.m_obj->get_shader().upload_uniform_float3("u_CameraPos", camera->get_position());
+        m_duck.m_obj->get_shader().upload_uniform_float3("u_Light.pos", m_light.m_position);
+        m_duck.m_obj->get_shader().upload_uniform_float3("u_Light.color", m_light.m_color);
         m_duck.m_obj->get_texture().bind(0);
         m_duck.m_obj->get_shader().upload_uniform_int("u_Texture", 0);
         auto batch = SimulationContext::s_jelly_cube->get_batch_points();
@@ -320,13 +325,6 @@ namespace sym
     struct
     {
       std::shared_ptr<Model> m_obj;
-      const glm::vec3 m_position = { 0, 0, 0 };
-      const glm::quat m_rotation = glm::angleAxis(glm::radians(-180.f), glm::vec3(0, 1, 0)) *
-          glm::angleAxis(glm::radians(-90.f), glm::vec3(1, 0, 0));
-      const float m_scale = 1;
-      //      const glm::mat4 m_model = glm::translate(glm::mat4(1), m_position) * glm::mat4_cast(m_rotation) *
-      //          glm::scale(glm::mat4(1), glm::vec3(m_scale));
-      // TODO: fix rotation
       const glm::mat4 m_model = glm::mat4(1);
     } m_duck;
   };

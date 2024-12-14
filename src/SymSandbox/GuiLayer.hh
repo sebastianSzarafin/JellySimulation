@@ -164,6 +164,7 @@ namespace sym
         ImGui::Checkbox("Surface", &SimulationData::s_display_surface);
         ImGui::Checkbox("Points", &SimulationData::s_display_points);
         ImGui::Checkbox("Springs", &SimulationData::s_display_springs);
+        ImGui::Checkbox("Rubber duck", &SimulationData::s_display_rubber_duck);
         ImGui::Spacing();
 
         ImGui::SeparatorText("");

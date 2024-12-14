@@ -23,6 +23,7 @@ namespace sym
     static bool s_display_surface;
     static bool s_display_points;
     static bool s_display_springs;
+    static bool s_display_rubber_duck;
   };
 
   inline float SimulationData::s_dt = .005f;
@@ -39,10 +40,11 @@ namespace sym
   inline const float SimulationData::s_A = 5;
   inline float SimulationData::s_gamma   = .5f;
 
-  inline glm::vec3 SimulationData::s_jelly_color = { 1, 0, 0 };
-  inline bool SimulationData::s_display_surface  = true;
-  inline bool SimulationData::s_display_points   = false;
-  inline bool SimulationData::s_display_springs  = false;
+  inline glm::vec3 SimulationData::s_jelly_color    = { 1, 0, 0 };
+  inline bool SimulationData::s_display_surface     = true;
+  inline bool SimulationData::s_display_points      = false;
+  inline bool SimulationData::s_display_springs     = false;
+  inline bool SimulationData::s_display_rubber_duck = false;
 } // namespace sym
 
 #endif // SIMULATIONAPP_SIMULATIONDATA_HH
