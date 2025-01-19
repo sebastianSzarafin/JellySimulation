@@ -1,6 +1,6 @@
 # JellySimulation
 
-![image.png](assets%2Fimage.png)
+![Screenshot from 2025-01-19 21-51-11](https://github.com/user-attachments/assets/c48e33d0-4697-44de-99ca-56e1c743ddd1)
 
 ### About
 
@@ -28,7 +28,13 @@ Shading is computed based on this definition of FFD transformation.
 
 ### Usage demo
 
+https://github.com/user-attachments/assets/84874daa-0c0b-4bad-9ed9-8a810f187553
 
+https://github.com/user-attachments/assets/7a0dee32-c688-4056-b28e-494d7d6cace5
+
+https://github.com/user-attachments/assets/fd388de4-2390-4ea1-ae49-110d705b502f
+
+https://github.com/user-attachments/assets/4af61819-f957-4faf-9536-0d72b55a341c
 
 ### Build
 The project is written in C++ using CMake as a build system and OpenGL for rendering.
